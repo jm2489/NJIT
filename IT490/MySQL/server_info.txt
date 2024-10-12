@@ -1,8 +1,7 @@
 # Current information about the database structure
 
 --ACCESS--
-MySQL server Public IP: 96.126.110.191
-MySQL server Wireguard IP: 10.0.0.10
+MySQL server Public IP: 172.233.160.160
 MySQL port: 3306
 MySQL User: rabbit
 MySQL Password: rabbitIT490!
