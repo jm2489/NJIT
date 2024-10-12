@@ -4,10 +4,57 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Form</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#login-form').on('submit', function(e) {
+        e.preventDefault();
+
+        var username = $('#username').val();
+        var password = $('#password').val();
+
+        $.ajax({
+          url: '/php/login.php',
+          type: 'POST',
+          data: { 
+            username: username, 
+            password: password 
+          },
+          success: function(response) {
+            if (response.includes("Login failed.")) {
+              $('#response').html("<pre><strong style='color:red;'>Login failed!</strong></pre>");
+            } else if (response.includes("Login successful!")) {
+              $('#response').html("<pre><strong style='color:green;'>Login successful!</strong></pre>");
+              // You can redirect the user after a successful login if needed
+              // window.location.href = "dashboard.php";  // Example redirect
+            } else {
+              // Show raw response for anything else
+              $('#response').html(response);
+            }
+          },
+          error: function() {
+            $('#response').html("<strong style='color:red;'>An error occurred. Please try again.</strong>");
+          }
+        });
+      });
+      // $('#info-button').on('click', function() {
+      //   $.ajax({
+      //     url: '/php/info.php',
+      //     type: 'GET',
+      //     success: function(response) {
+      //       $('#response').html(response);
+      //     },
+      //     error: function() {
+      //       $('#response').html("<strong style='color:red;'>Failed to load info.</strong>");
+      //     }
+      //   });
+      // });
+    });
+  </script>
 </head>
 <body>
-  <h2>Login Form</h2>
-  <form action="login.php" method="post">
+  <h2>Login</h2>
+  <form id="login-form">
     <label for="username">Username:</label><br>
     <input type="text" id="username" name="username" required><br><br>
     
@@ -16,5 +63,10 @@
     
     <input type="submit" value="Login">
   </form>
+
+  <!-- <button id="info-button">Get Info</button> -->
+
+  <!-- php response back to html -->
+  <div id="response"></div>
 </body>
 </html>

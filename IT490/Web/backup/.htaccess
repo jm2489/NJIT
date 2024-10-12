@@ -1,0 +1,15 @@
+#<FilesMatch "\.php$">
+#    Require all denied
+#</FilesMatch>
+
+#<Files "login.php">
+#    Require all granted
+#</Files>
+
+# Allow access to other PHP files
+<FilesMatch "\.php$">
+    Require all granted
+</FilesMatch>
+
+# RewriteEngine On
+# RewriteRule ^run-script$ script.php [L]
