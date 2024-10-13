@@ -22,11 +22,9 @@
           },
           success: function(response) {
             if (response.includes("Login failed.")) {
-              $('#response').html("<pre><strong style='color:red;'>Login failed!</strong></pre>");
-              $('#response').html(response);
+              $('#response').html("<pre><strong style='color:red;'>Login failed!</strong></pre><br>" + response);
             } else if (response.includes("Login successful!")) {
-              $('#response').html("<pre><strong style='color:green;'>Login successful!</strong></pre>");
-              $('#response').html(response);
+              $('#response').html("<pre><strong style='color:green;'>Login successful!</strong></pre><br>" + response);
               // Redirect the user after a successful login if needed
               // window.location.href = "dashboard.php";  // Example redirect
             } else {
