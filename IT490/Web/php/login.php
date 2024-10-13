@@ -1,29 +1,23 @@
 <?php
+// Made a custom 403 page to deter rude fairytale creatures
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    // Set HTTP status to 403 Forbidden
     http_response_code(403);
-
-    // Set content type to GIF
     header('Content-Type: image/gif');
 
-    // Specify the path to your funny GIF
+    // Hehe
     $gifPath = __DIR__ . '/../media/swamp.gif';
 
-    // Check if the file exists
     if (file_exists($gifPath)) {
-        // Read and output the GIF
         readfile($gifPath);
     } else {
-        // If the GIF doesn't exist, show a default message
-        echo "No funny GIF today :(";
+        echo "This is where I would have my GIF.... IF I HAD ONE!";
     }
-    exit; // Stop further script execution
+    exit;
 }
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-// Check if form data is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -44,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Output the response (this will be shown in the HTML)
     echo "Client received response: <br>".PHP_EOL;
     echo "<pre>";
-    print_r($response);  // Display the raw response from RabbitMQ
+    print_r($response);
     echo "</pre>";
     
 } else {
