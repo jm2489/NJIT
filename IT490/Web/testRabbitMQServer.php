@@ -4,63 +4,89 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
-function doLogin($username,$password)
-{
-    // May need to implement sanitation for increased security. I'm too lazy right now.
+$requestsCounter = 0;
+date_default_timezone_set('America/New_York');
+
+function doLogin($username, $password) {
     try {
-      // Database connection details
-      $dsn = 'mysql:host=172.104.212.164;dbname=logindb';
-      $dbUsername = 'rabbit';
-      $dbPassword = 'rabbitIT490!';
+        // Database connection details
+        $dbLogin = 'mysql:host=10.0.0.3;dbname=logindb';
+        $dbUsername = 'rabbit';
+        $dbPassword = 'rabbitIT490!';
 
-      // Create a new PDO instance
-      $pdo = new PDO($dsn, $dbUsername, $dbPassword);
-      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-      // Prepare and execute the query
-      $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
-      $stmt->bindParam(':username', $username);
-      $stmt->bindParam(':password', $password);  // Need to replace as hash. I was using basic login example
+        // Fetch only the hashed password from the database.
+        $stmt = $pdo->prepare("SELECT password FROM users WHERE username = :username");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
 
-      $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($user && password_verify($password, $user['password'])) {
+            // Update the last_login field on successful login
+            $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE username = :username");
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
 
-      // Check if any rows were returned
-      if ($stmt->rowCount() > 0) {
-          return true; // Login successful
-      } else {
-          return false; // Login failed
-      }
+            // Return JSON-structured success message
+            return [
+                "success" => true,
+                "message" => "Login successful!"
+            ];
+        } else {
+            // Return JSON-structured failure message
+            return [
+                "success" => false,
+                "message" => "Invalid username or password."
+            ];
+        }
+    } catch (PDOException $e) {
+        error_log('Database error: ' . $e->getMessage());
 
-  } catch (PDOException $e) {
-      // Log error
-      error_log('Database error: ' . $e->getMessage());
-      return false;
-  }
+        // Return JSON-structured error response
+        return [
+            "success" => false,
+            "message" => "An error occurred during login. Please try again later."
+        ];
+    }
 }
 
-function requestProcessor($request)
-{
-  echo "received request".PHP_EOL;
-  var_dump($request);
-  if(!isset($request['type']))
-  {
-    return "ERROR: unsupported message type";
-  }
-  switch ($request['type'])
-  {
-    case "login":
-      return doLogin($request['username'],$request['password']);
-    case "validate_session":
-      return doValidate($request['sessionId']);
-  }
-  return array("returnCode" => '0', 'message'=>"Server received request and processed");
+function requestProcessor($request) {
+    global $requestsCounter;
+    $logFile = __DIR__ . '/received_messages.log';
+    $logTime = date('m-d-Y H:i:s');
+    $logRequest = "[" . $logTime . "] Received request: " . print_r($request, true) . PHP_EOL;
+    file_put_contents($logFile, $logRequest, FILE_APPEND);
+
+    if (!isset($request['type'])) {
+        return json_encode([
+            "success" => false,
+            "message" => "ERROR: Unsupported message type"
+        ]);
+    }
+
+    switch ($request['type']) {
+        case "login":
+            $response = doLogin($request['username'], $request['password']);
+            break;
+        case "validate_session":
+            $response = doValidate($request['sessionId']);
+            break;
+        default:
+            $response = [
+                "success" => false,
+                "message" => "ERROR: Unknown request type"
+            ];
+    }
+
+    return json_encode($response);
 }
 
-$server = new rabbitMQServer("testRabbitMQ.ini","testServer");
+$server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 
-echo "testRabbitMQServer BEGIN".PHP_EOL;
+echo "testRabbitMQServer BEGIN" . PHP_EOL;
 $server->process_requests('requestProcessor');
-echo "testRabbitMQServer END".PHP_EOL;
+echo "testRabbitMQServer END" . PHP_EOL;
 exit();
 ?>
-
