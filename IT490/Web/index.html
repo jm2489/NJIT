@@ -13,6 +13,7 @@
 
         var username = $('#username').val();
         var password = $('#password').val();
+        var showRawJson = $('#show-json').is(':checked');
 
         $.ajax({
           url: '/php/login.php',
@@ -24,21 +25,18 @@
           success: function (response) {
             try {
               let result = typeof response === 'string' ? JSON.parse(response) : response;
-              if (result.success) {
-                $('#response').html(
-                  "Server Response:<br>" +
-                  JSON.stringify(result) +
-                  "<br><pre><strong style='color:green;'>"+result.message+"</strong></pre><br>"
-                );
-                // Redirect the user after a successful login if needed
-                // window.location.href = "dashboard.php";
-              } else {
-                $('#response').html(
-                  "Server Response:<br>" +
-                  JSON.stringify(result) +
-                  "<br><pre><strong style='color:red;'>"+result.message+"</strong></pre><br>"
-                );
-              };
+              let color = result.success ? 'green' : 'red';
+
+              let formattedResponse = `
+                <pre><strong style="color:${color};">${result.message}</strong></pre><br>
+              `;
+
+              let rawJsonResponse = showRawJson
+                ? `<h4>Raw JSON Response:</h4><pre>${JSON.stringify(result, null, 2)}</pre>`
+                : '';
+
+              $('#response').html(formattedResponse + rawJsonResponse);
+
             } catch (error) {
               console.error("JSON parse error:", error);
               $('#response').html(
@@ -51,20 +49,6 @@
           }
         });
       });
-      // This is another fucntion. Probably going to change this to a register button
-      // 
-      // $('#info-button').on('click', function() {
-      //   $.ajax({
-      //     url: '/php/info.php',
-      //     type: 'GET',
-      //     success: function(response) {
-      //       $('#response').html(response);
-      //     },
-      //     error: function() {
-      //       $('#response').html("<strong style='color:red;'>Failed to load info.</strong>");
-      //     }
-      //   });
-      // });
     });
   </script>
 </head>
@@ -80,13 +64,10 @@
 
     <input type="submit" value="Login">
     <label>
-      <input type="checkbox" id="show-json"> Show Raw JSON Response
+      <br><br>Raw JSON Response<input type="checkbox" id="show-json">
     </label>
   </form>
 
-  <!-- <button id="info-button">Get Info</button> -->
-
-  <!-- php response back to html -->
   <div id="response"></div>
 </body>
 
