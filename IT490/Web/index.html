@@ -31,7 +31,7 @@
                   "<br><pre><strong style='color:green;'>"+result.message+"</strong></pre><br>"
                 );
                 // Redirect the user after a successful login if needed
-                // window.location.href = "dashboard.php";  // Example redirect
+                // window.location.href = "dashboard.php";
               } else {
                 $('#response').html(
                   "Server Response:<br>" +
@@ -79,6 +79,9 @@
     <input type="password" id="password" name="password" required><br><br>
 
     <input type="submit" value="Login">
+    <label>
+      <input type="checkbox" id="show-json"> Show Raw JSON Response
+    </label>
   </form>
 
   <!-- <button id="info-button">Get Info</button> -->
