@@ -38,7 +38,7 @@ function doLogin($username, $password) {
             // Return JSON-structured failure message
             return [
                 "success" => false,
-                "message" => "Invalid username or password."
+                "message" => "Invalid username or password."a,,q//al
             ];
         }
     } catch (PDOException $e) {
