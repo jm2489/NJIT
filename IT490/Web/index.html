@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Form</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    $(document).ready(function() {
-      $('#login-form').on('submit', function(e) {
+    $(document).ready(function () {
+      $('#login-form').on('submit', function (e) {
         e.preventDefault();
 
         var username = $('#username').val();
@@ -16,23 +17,37 @@
         $.ajax({
           url: '/php/login.php',
           type: 'POST',
-          data: { 
-            username: username, 
-            password: password 
+          data: {
+            username: username,
+            password: password
           },
-          success: function(response) {
-            if (response.includes("Login failed.")) {
-              $('#response').html("<pre><strong style='color:red;'>Login failed!</strong></pre><br>" + response);
-            } else if (response.includes("Login successful!")) {
-              $('#response').html("<pre><strong style='color:green;'>Login successful!</strong></pre><br>" + response);
-              // Redirect the user after a successful login if needed
-              // window.location.href = "dashboard.php";  // Example redirect
-            } else {
-              // Show raw response for anything else
-              $('#response').html(response);
+          success: function (response) {
+            try {
+              let result = typeof response === 'string' ? JSON.parse(response) : response;
+              if (result.success) {
+                $('#response').html(
+                  "Server Response:<br>" +
+                  JSON.stringify(result) +
+                  "<br><pre><strong style='color:green;'>"+result.message+"</strong></pre><br>"
+                );
+                // Redirect the user after a successful login if needed
+                // window.location.href = "dashboard.php";  // Example redirect
+              } else {
+                $('#response').html(
+                  "Server Response:<br>" +
+                  JSON.stringify(result) +
+                  "<br>" + result.success +
+                  "<br><pre><strong style='color:red;'>"+result.message+"</strong></pre><br>"
+                );
+              };
+            } catch (error) {
+              console.error("JSON parse error:", error);
+              $('#response').html(
+                `<pre><strong style='color:red;'>Invalid JSON response.</strong></pre>`
+              );
             }
           },
-          error: function() {
+          error: function () {
             $('#response').html("<strong style='color:red;'>An error occurred. Please try again.</strong>");
           }
         });
@@ -54,15 +69,16 @@
     });
   </script>
 </head>
+
 <body>
   <h2>Login</h2>
   <form id="login-form">
     <label for="username">Username:</label><br>
     <input type="text" id="username" name="username" required><br><br>
-    
+
     <label for="password">Password:</label><br>
     <input type="password" id="password" name="password" required><br><br>
-    
+
     <input type="submit" value="Login">
   </form>
 
@@ -71,4 +87,5 @@
   <!-- php response back to html -->
   <div id="response"></div>
 </body>
+
 </html>

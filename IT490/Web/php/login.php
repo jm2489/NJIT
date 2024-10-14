@@ -1,12 +1,11 @@
 <?php
-// Made a custom 403 page to deter rude fairytale creatures
+// Custom 403 page to deter unauthorized access from fairytale creatures
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(403);
     header('Content-Type: image/gif');
 
-    // Hehe
+    // Serve a fun GIF or fallback message.. Hehehe
     $gifPath = __DIR__ . '/../media/swamp.gif';
-
     if (file_exists($gifPath)) {
         readfile($gifPath);
     } else {
@@ -23,26 +22,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     
-    // RabbitMQ client setup
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    // Create the request
-    $request = array();
-    $request['type'] = "login";
-    $request['username'] = $username;
-    $request['password'] = $password;
-    $request['message'] = "Login Request";
-    
-    // Send the request and get the response
+    $request = [
+        'type' => "login",
+        'username' => $username,
+        'password' => $password,
+        'message' => "Login Request"
+    ];
+
     $response = $client->send_request($request);
 
-    // Output the response (this will be shown in the HTML)
-    echo "Client received response: <br>".PHP_EOL;
-    echo "<pre>";
-    print_r($response);
-    echo "</pre>";
-    
+    header('Content-Type: application/json');
+
+    echo json_encode($response);
 } else {
-    // Handle invalid request method
-    echo "Invalid request method.";
+    http_response_code(405);
+    echo json_encode([
+        "success" => false,
+        "message" => "Invalid request method."
+    ]);
 }
