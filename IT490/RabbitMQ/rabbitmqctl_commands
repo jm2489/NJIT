@@ -1,0 +1,176 @@
+## **General Commands**
+
+### 1. **Check Status of RabbitMQ Server**
+
+rabbitmqctl status
+
+
+- **What it does:** Displays the current status of the RabbitMQ server, including running processes and plugins.
+
+### 2. **List Available Virtual Hosts (vhosts)**
+
+rabbitmqctl list_vhosts
+
+
+- **What it does:** Lists all virtual hosts on the server.
+
+---
+
+### 3. **List All Users**
+
+rabbitmqctl list_users
+
+## **User Management**
+
+### 3.1 **Add a New User**
+
+rabbitmqctl add_user <username> <password>
+
+
+- **What it does:** Creates a new user with the specified username and password.
+
+### 4. **Delete a User**
+
+rabbitmqctl delete_user <username>
+
+
+
+### 5. **Set User Permissions**
+
+rabbitmqctl set_permissions -p <vhost> <username> ".*" ".*" ".*"
+
+
+- **What it does:** Grants the user permissions to configure, write, and read from the specified vhost.
+
+---
+
+## **Virtual Host Management**
+
+### 6. **Create a New vhost**
+
+rabbitmqctl add_vhost <vhost-name>
+
+
+
+### 7. **Delete a vhost**
+
+rabbitmqctl delete_vhost <vhost-name>
+
+
+
+---
+
+## **Queue Management**
+
+### 8. **List Queues in a vhost**
+
+rabbitmqctl -p <vhost> list_queues
+
+
+
+### 9. **Delete a Queue**
+
+rabbitmqctl -p <vhost> delete_queue <queue-name>
+
+
+
+---
+
+## **Exchange Management**
+
+### 10. **List Exchanges in a vhost**
+
+rabbitmqctl -p <vhost> list_exchanges
+
+
+
+### 11. **Delete an Exchange**
+
+rabbitmqctl -p <vhost> delete_exchange <exchange-name>
+
+
+
+---
+
+## **Binding Management**
+
+### 12. **List Bindings in a vhost**
+
+rabbitmqctl -p <vhost> list_bindings
+
+
+- **What it does:** Lists all bindings between exchanges and queues in a specific vhost.
+
+---
+
+## **Message Management**
+
+### 13. **Purge All Messages from a Queue**
+
+rabbitmqctl -p <vhost> purge_queue <queue-name>
+
+
+- **What it does:** Removes all messages from the specified queue.
+
+---
+
+## **Cluster Management**
+
+### 14. **List All RabbitMQ Nodes**
+
+rabbitmqctl cluster_status
+
+
+
+### 15. **Join a Cluster**
+
+rabbitmqctl join_cluster rabbit@<node-name>
+
+
+- **What it does:** Adds the current RabbitMQ node to a cluster.
+
+---
+
+## **Plugin Management**
+
+### 16. **Enable a Plugin**
+
+rabbitmq-plugins enable <plugin-name>
+
+
+
+### 17. **Disable a Plugin**
+
+rabbitmq-plugins disable <plugin-name>
+
+
+
+---
+
+## **Monitoring and Diagnostics**
+
+### 18. **List All Connections**
+
+rabbitmqctl list_connections
+
+
+
+### 19. **List All Channels**
+
+rabbitmqctl list_channels
+
+
+
+### 20. **Check Node Health**
+
+rabbitmqctl node_health_check
+
+
+- **What it does:** Checks the health status of the RabbitMQ node.
+
+---
+
+## **Helpful Options**
+- **`-p <vhost>`**: Specify the virtual host (vhost) for an operation.
+- **`list_*` commands**: Use `list_queues`, `list_exchanges`, and `list_bindings` to inspect the RabbitMQ setup.
+- **`--help`**: Use `rabbitmqctl <command> --help` to get specific details on each command.
