@@ -1,0 +1,24 @@
+[10-16-2024 14:09:52] Received request: Array
+(
+    [type] => login
+    [username] => steve
+    [password] => password
+    [message] => Login Request
+)
+
+[10-16-2024 14:11:30] Received request: Array
+(
+    [type] => login
+    [username] => steve
+    [password] => password
+    [message] => Login Request
+)
+
+[10-16-2024 14:16:09] Received request: Array
+(
+    [type] => login
+    [username] => steve
+    [password] => password
+    [message] => Login Request
+)
+
