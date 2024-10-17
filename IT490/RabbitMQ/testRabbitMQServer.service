@@ -9,7 +9,7 @@ ExecStart=/usr/bin/php /home/jude/IT490-Project/testRabbitMQServer.php
 Restart=always
 User=jude
 Group=jude
-PIDFile=/var/run/testRabbitMQServer.pid
+PIDFile=/run/testRabbitMQServer.pid
 
 [Install]
 WantedBy=multi-user.target
