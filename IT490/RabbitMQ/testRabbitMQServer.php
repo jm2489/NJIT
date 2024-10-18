@@ -28,7 +28,7 @@ function doLogin($username, $password) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($user && password_verify($password, $user['password'])) {
             // Update the last_login field on successful login
-            $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE username = :username");
+            $stmt = $pdo->prepare("UPDATE users SET last_login = UNIX_TIMESTAMP() WHERE username = :username");
             $stmt->bindParam(':username', $username);
             $stmt->execute();
 
@@ -43,11 +43,17 @@ function doLogin($username, $password) {
             ];
         }
     } catch (PDOException $e) {
-        error_log('Database error: ' . $e->getMessage());
+        $error_message = 'Database error: ' . $e->getMessage();
+        error_log($error_message);
+        
+        // Log the error to a local file as well
+        $log_file = 'error.log';
+        file_put_contents($log_file, date('[Y-m-d H:i:s] ') . $error_message . PHP_EOL, FILE_APPEND);
         return [
             "success" => false,
             "message" => "An error occurred during login. Please try again later."
         ];
+        
     }
 }
 
