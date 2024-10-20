@@ -33,8 +33,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $response = $client->send_request($request);
 
-    header('Content-Type: application/json');
+    $response = json_decode($response, true);
 
+    // DEBUG: Log the response to see what is returned
+    error_log(print_r($response, true), 3, __DIR__ . '/error.log');
+
+    if (isset($response['success']) && $response['success']) {
+        // Redirect to another PHP file upon successful login I set info.php as an example
+        echo json_encode([
+            "success" => true,
+            "message" => "Login successful.",
+            "redirect" => "/php/info.php"
+        ]);
+        exit;
+    }
+
+    header('Content-Type: application/json');
     echo json_encode($response);
 } else {
     http_response_code(405);

@@ -37,6 +37,12 @@
 
               $('#response').html(formattedResponse + rawJsonResponse);
 
+              // Handle redirection if login is successful
+              if (result.success && result.redirect) {
+                window.location.href = result.redirect;
+                return;
+              }
+
             } catch (error) {
               console.error("JSON parse error:", error);
               $('#response').html(
