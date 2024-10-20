@@ -31,15 +31,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'message' => "Login Request"
     ];
 
+    // Send the request to RabbitMQ server
     $response = $client->send_request($request);
 
+    // Decode the JSON response from RabbitMQ
     $response = json_decode($response, true);
 
-    // DEBUG: Log the response to see what is returned
-    error_log(print_r($response, true), 3, __DIR__ . '/error.log');
-
+    // Check for successful login and presence of the session token
     if (isset($response['success']) && $response['success']) {
-        // Redirect to another PHP file upon successful login I set info.php as an example
+        if (isset($response['session_token'])) {
+            // Set the session token as a cookie
+            setcookie('session', $response['session_token'], [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'secure' => false, // Set to true in production with HTTPS
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+        }
+
+        // Send JSON response with redirect info
+        header('Content-Type: application/json');
         echo json_encode([
             "success" => true,
             "message" => "Login successful.",
@@ -48,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
+    // If login fails, return the response as JSON
     header('Content-Type: application/json');
     echo json_encode($response);
 } else {
