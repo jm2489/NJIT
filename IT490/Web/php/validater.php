@@ -2,7 +2,7 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
-$home = '/var/www/html/index.html';
+$home = '/index.html';
 
 // Function to validate the session token
 function validateSession() {
