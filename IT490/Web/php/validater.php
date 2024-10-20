@@ -33,7 +33,7 @@ function validateSession() {
         // Check if the response indicates a valid session
         if (isset($response['success']) && $response['success']) {
             // Session is valid, return the username
-            return $response['username'];
+            return json_encode($response);
         } else {
             // Session is invalid or expired; redirect to login
             header('Location: ' . $home);
