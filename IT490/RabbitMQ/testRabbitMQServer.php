@@ -1,40 +1,46 @@
-#!/usr/bin/php
 <?php
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 $config = include('dbClient.php');
+$ttl = 3600;
 
-$requestsCounter = 0;
 date_default_timezone_set('America/New_York');
 
+// Function to handle login
 function doLogin($username, $password) {
-    try {
-        global $config;
-        $dbhost = $config['DBHOST'];
-        $logindb = $config['LOGINDATABASE'];
-        $dbLogin = "mysql:host=$dbhost;dbname=$logindb";
-        $dbUsername = $config['DBUSER'];
-        $dbPassword = $config['DBPASSWORD'];
+    global $config, $ttl;
+    $dbhost = $config['DBHOST'];
+    $logindb = $config['LOGINDATABASE'];
+    $dbLogin = "mysql:host=$dbhost;dbname=$logindb";
+    $dbUsername = $config['DBUSER'];
+    $dbPassword = $config['DBPASSWORD'];
 
+    try {
+        // Connect to the database
         $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        // Fetch only the hashed password from the database.
         $stmt = $pdo->prepare("SELECT password FROM users WHERE username = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
-
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Verify password
         if ($user && password_verify($password, $user['password'])) {
-            // Update the last_login field on successful login
-            $stmt = $pdo->prepare("UPDATE users SET last_login = UNIX_TIMESTAMP() WHERE username = :username");
+            $token = bin2hex(random_bytes(32));
+            $tokenExpire = time() + $ttl;
+
+            // Store the session token in the database and update the token session if record already exists to avoid duplicates
+            $stmt = $pdo->prepare("INSERT INTO sessions (username, session_token, expire_date) VALUES (:username, :token, :tokenExpire) ON DUPLICATE KEY UPDATE session_token = :token, expire_date = :tokenExpire");
             $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':token', $token);
+            $stmt->bindParam(':tokenExpire', $tokenExpire, PDO::PARAM_INT);
             $stmt->execute();
 
             return [
                 "success" => true,
-                "message" => "Login successful!"
+                "message" => "Login successful!",
+                "session_token" => $token
             ];
         } else {
             return [
@@ -43,22 +49,53 @@ function doLogin($username, $password) {
             ];
         }
     } catch (PDOException $e) {
-        $error_message = 'Database error: ' . $e->getMessage();
-        error_log($error_message);
-        
-        // Log the error to a local file as well
-        $log_file = 'error.log';
-        file_put_contents($log_file, date('[Y-m-d H:i:s] ') . $error_message . PHP_EOL, FILE_APPEND);
         return [
             "success" => false,
-            "message" => "An error occurred during login. Please try again later."
+            "message" => "An error occurred: " . $e->getMessage()
         ];
-        
     }
 }
 
+// Function to validate session token
+function validateSession($sessionToken) {
+    global $config;
+    $dbhost = $config['DBHOST'];
+    $logindb = $config['LOGINDATABASE'];
+    $dbLogin = "mysql:host=$dbhost;dbname=$logindb";
+    $dbUsername = $config['DBUSER'];
+    $dbPassword = $config['DBPASSWORD'];
+
+    try {
+        $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Validate the session token
+        $stmt = $pdo->prepare("SELECT username, expire_date FROM sessions WHERE session_token = :token");
+        $stmt->bindParam(':token', $sessionToken);
+        $stmt->execute();
+
+        $session = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($session && $session['expire_date'] > time()) {
+            return [
+                "success" => true,
+                "username" => $session['username']
+            ];
+        } else {
+            return [
+                "success" => false,
+                "message" => "Session is invalid or expired."
+            ];
+        }
+    } catch (PDOException $e) {
+        return [
+            "success" => false,
+            "message" => "An error occurred: " . $e->getMessage()
+        ];
+    }
+}
+
+// Function to process incoming requests
 function requestProcessor($request) {
-    global $requestsCounter;
     $logFile = __DIR__ . '/received_messages.log';
     $logTime = date('m-d-Y H:i:s');
     $logRequest = "[" . $logTime . "] Received request: " . print_r($request, true) . PHP_EOL;
@@ -76,7 +113,7 @@ function requestProcessor($request) {
             $response = doLogin($request['username'], $request['password']);
             break;
         case "validate_session":
-            $response = doValidate($request['sessionId']);
+            $response = validateSession($request['session_token']);
             break;
         default:
             $response = [
@@ -94,4 +131,3 @@ echo "testRabbitMQServer BEGIN" . PHP_EOL;
 $server->process_requests('requestProcessor');
 echo "testRabbitMQServer END" . PHP_EOL;
 exit();
-?>
