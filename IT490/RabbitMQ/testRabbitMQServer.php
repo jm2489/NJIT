@@ -3,11 +3,11 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 $config = include('dbClient.php');
+// Change accordingly this is set to 1 hour
 $ttl = 3600;
 
 date_default_timezone_set('America/New_York');
 
-// Function to handle login
 function doLogin($username, $password) {
     global $config, $ttl;
     $dbhost = $config['DBHOST'];
@@ -25,8 +25,13 @@ function doLogin($username, $password) {
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Verify password
+        // Verify password and update last_login field for user
         if ($user && password_verify($password, $user['password'])) {
+            $stmt = $pdo->prepare("UPDATE users SET last_login = TIME() WHERE username = :username");
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+
+            // Prepare token
             $token = bin2hex(random_bytes(32));
             $tokenExpire = time() + $ttl;
 
