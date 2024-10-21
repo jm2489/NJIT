@@ -61,7 +61,6 @@ function doLogin($username, $password) {
     }
 }
 
-// Function to validate session token
 function validateSession($sessionToken) {
     global $config;
     $dbhost = $config['DBHOST'];
@@ -99,7 +98,6 @@ function validateSession($sessionToken) {
     }
 }
 
-// Function to process incoming requests
 function requestProcessor($request) {
     $logFile = __DIR__ . '/received_messages.log';
     $logTime = date('m-d-Y H:i:s');
