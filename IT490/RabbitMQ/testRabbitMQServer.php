@@ -27,7 +27,7 @@ function doLogin($username, $password) {
 
         // Verify password and update last_login field for user
         if ($user && password_verify($password, $user['password'])) {
-            $stmt = $pdo->prepare("UPDATE users SET last_login = TIME() WHERE username = :username");
+            $stmt = $pdo->prepare("UPDATE users SET last_login = UNIX_TIMESTAMP() WHERE username = :username");
             $stmt->bindParam(':username', $username);
             $stmt->execute();
 
