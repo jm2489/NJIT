@@ -27,13 +27,16 @@ function doLogin($username, $password) {
 
         // Verify password and update last_login field for user
         if ($user && password_verify($password, $user['password'])) {
-            $stmt = $pdo->prepare("UPDATE users SET last_login = UNIX_TIMESTAMP() WHERE username = :username");
+            // Update last_login field with UNIX epoch time
+            $unixEpoch = time();
+            $stmt = $pdo->prepare("UPDATE users SET last_login = :unixEpoch WHERE username = :username");
+            $stmt->bindParam(':unixEpoch', $unixEpoch, PDO::PARAM_INT);
             $stmt->bindParam(':username', $username);
             $stmt->execute();
 
             // Prepare token
             $token = bin2hex(random_bytes(32));
-            $tokenExpire = time() + $ttl;
+            $tokenExpire = $unixEpoch + $ttl;
 
             // Store the session token in the database and update the token session if record already exists to avoid duplicates
             $stmt = $pdo->prepare("INSERT INTO sessions (username, session_token, expire_date) VALUES (:username, :token, :tokenExpire) ON DUPLICATE KEY UPDATE session_token = :token, expire_date = :tokenExpire");
