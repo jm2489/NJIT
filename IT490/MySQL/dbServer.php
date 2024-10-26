@@ -6,7 +6,7 @@
  */
 
 try {
-    require('dbClient.php');
+    require('dbClient.inc');
 } catch (Error $e) {
     echo json_encode([
         'success' => false,
