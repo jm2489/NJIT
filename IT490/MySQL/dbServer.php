@@ -1,76 +1,120 @@
 <?php
-
 /**
  * @author jm2489
  * @date 2024-10-25
- * @description Database server will be running a php script to handle all security related information. The RMQ will just need to send the request.
+ * @description Socket server handling JSON-encoded messages and querying the database.
  */
 
 try {
-    require('config.php');
+    require('dbClient.php');
 } catch (Error $e) {
     echo json_encode([
-        'status' => 'error',
-        'message' => 'Required configuration file not found or caused an error.',
+        'success' => false,
+        'message' => 'Configuration file error.',
         'details' => $e->getMessage()
     ]);
     exit;
 }
 
-function dbConnect()
-{
-    $pdo = new PDO(DBHOST, DBUSER, DBPASSWORD);
-    return $pdo;
+function dbConnect() {
+    try {
+        $dsn = 'mysql:host=' . DBHOST . ';dbname=' . DBNAME;
+        $pdo = new PDO($dsn, DBUSER, DBPASSWORD);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Database connection failed.',
+            'details' => $e->getMessage()
+        ]);
+        exit;
+    }
 }
 
-// Create a socket
 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 if ($socket === false) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to create socket.',
-        'details' => socket_strerror(socket_last_error())
-    ]);
+    echo "Failed to create socket: " . socket_strerror(socket_last_error()) . "\n";
     exit;
 }
 
-// Bind socket to an address and port. localhost:8888
-$host = '127.0.0.1';
+$host = '0.0.0.0'; 
 $port = 8888;
 if (!socket_bind($socket, $host, $port)) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to bind socket to address and port.',
-        'details' => socket_strerror(socket_last_error())
-    ]);
+    echo "Failed to bind socket: " . socket_strerror(socket_last_error($socket)) . "\n";
     exit;
 }
 
-// Listen for incoming connections
-if (!socket_listen($socket)) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to listen for incoming connections.',
-        'details' => socket_strerror(socket_last_error())
-    ]);
+if (!socket_listen($socket, 3)) {
+    echo "Failed to listen: " . socket_strerror(socket_last_error($socket)) . "\n";
     exit;
 }
 
-// Accept incoming connections
-$connection = socket_accept($socket);
-if ($connection === false) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Failed to accept incoming connection.',
-        'details' => socket_strerror(socket_last_error())
-    ]);
-    exit;
+echo "Listening for connections on $host:$port...\n";
+
+// Main loop to handle incoming connections
+while (true) {
+    $connection = socket_accept($socket);
+    if ($connection === false) {
+        echo "Failed to accept connection: " . socket_strerror(socket_last_error($socket)) . "\n";
+        continue;
+    }
+
+    // echo "Connection accepted.\n"; // Debug
+
+    $data = socket_read($connection, 4096, PHP_NORMAL_READ);
+    if ($data === false) {
+        echo "Failed to read data: " . socket_strerror(socket_last_error($connection)) . "\n";
+        socket_close($connection);
+        continue;
+    }
+
+    $data = trim($data);
+    // echo "Received data: $data\n"; // Debug
+
+    $jsonData = json_decode($data, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $response = json_encode([
+            'success' => false,
+            'message' => 'Invalid JSON format.'
+        ]);
+        socket_write($connection, $response, strlen($response));
+        socket_close($connection);
+        continue;
+    }
+
+    // Check for a query field
+    if (isset($jsonData['query'])) {
+        $query = $jsonData['query'];
+
+        $pdo = dbConnect();
+
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $response = json_encode([
+                'success' => 'success',
+                'data' => $results
+            ]);
+        } catch (PDOException $e) {
+            $response = json_encode([
+                'success' => false,
+                'message' => 'Query execution failed.',
+                'details' => $e->getMessage()
+            ]);
+        }
+        socket_write($connection, $response, strlen($response));
+    } else {
+        $response = json_encode([
+            'success' => false,
+            'message' => 'Missing "query" field in request.'
+        ]);
+        socket_write($connection, $response, strlen($response));
+    }
+    // socket_shutdown is needed to make sure the connection closes properly
+    socket_shutdown($connection);
+    socket_close($connection);
 }
-
-// Read data from client
-$data = socket_read($connection, 1024);
-echo "Recieved data: " . $data;
-
-// Close the socket
 socket_close($socket);
-socket_close($client);
