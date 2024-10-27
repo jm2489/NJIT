@@ -42,7 +42,7 @@ The table schema for the `pandemicinfodb` database is as follows:
 +---------------+---------------+------+-----+------------------+-------+
 | Field         | Type          | Null | Key | Default          | Extra |
 +---------------+---------------+------+-----+------------------+-------+
-| participantId | int(11)       | NO   | MUL | NULL             |       |
+| id            | int(11)       | NO   | MUL | NULL             |       |
 | latitude      | float(9,6)    | NO   |     | NULL             |       |
 | longitude     | float(10,6)   | NO   |     | NULL             |       |
 | created_at    | bigint(20)    | NO   |     | unix_timestamp() |       |
