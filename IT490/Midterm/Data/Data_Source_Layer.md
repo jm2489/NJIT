@@ -122,29 +122,11 @@ The data source layer makes the following REST based API calls. All information 
     ```
 - **GetListOfParticipantsAtRisk(Time Range)**:
     - Gather infection data over a specified time range to analyze trends.
+![Participants At Risk](ParticipantsAtRisk.png)
 
-    ```mermaid
-    graph TD;
-        A1[Start] --> B1[GetListOfParticipantsAtRisk]
-        B1 --> C1[Fetch Global Infection Data]
-        C1 --> D1[Filter Data by Time Range]
-        D1 --> E1[Identify At-Risk Participants]
-        E1 --> F1[Track Contacts for Each Participant]
-        F1 --> G1[Return List of At-Risk Participants]
-        G1 --> H1[End]
-    ```
 - **GenerateProjectionMap (Future Time Range)**:
 - Use historical data to project future infection rates and visualize the results on a map.
-```mermaid
-graph TD;
-    A2[Start] --> B2[GenerateProjectionMap]
-    B2 --> C2[Fetch Historical Infection Data]
-    C2 --> D2[Analyze Trends and Patterns]
-    D2 --> E2[Project Future Infection Rates]
-    E2 --> F2[Generate Map with Projections]
-    F2 --> G2[Return Projection Map]
-    G2 --> H2[End]
-```
+![Projection Map](ProjectionMap.png)
 
 ## Security
 - **Authentication**: Use API tokens securely, pass them in the request headers, and store them in environment variables.
