@@ -13,3 +13,17 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
     // Handle invalid or unsuccessful response
     echo "Session validation failed.";
 }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Button</title>
+</head>
+<body>
+    <form action="query.php" method="POST">
+        <button type="submit">Kraken Query</button>
+    </form>
+</body>
+</html>

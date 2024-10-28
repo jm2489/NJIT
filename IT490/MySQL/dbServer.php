@@ -62,14 +62,14 @@ while (true) {
 
     // echo "Connection accepted.\n"; // Debug
 
-    $data = socket_read($connection, 4096, PHP_NORMAL_READ);
+    $data = socket_read($connection, 4096, PHP_BINARY_READ);
     if ($data === false) {
         echo "Failed to read data: " . socket_strerror(socket_last_error($connection)) . "\n";
         socket_close($connection);
         continue;
     }
 
-    $data = trim($data);
+    // $data = trim($data);
     // echo "Received data: $data\n"; // Debug
 
     $jsonData = json_decode($data, true);

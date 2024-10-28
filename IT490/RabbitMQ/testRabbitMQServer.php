@@ -2,6 +2,7 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
+require_once('Kraken/KrakenAPIClient.php');
 $config = include('dbClient.php');
 // Change accordingly this is set to 1 hour
 $ttl = 3600;
@@ -100,6 +101,22 @@ function validateSession($sessionToken) {
     }
 }
 
+function krakenQuery() {
+    global $key,$secret;
+    // Set which platform to use (beta or standard)
+    $beta = false; 
+    $url = $beta ? 'https://api.beta.kraken.com' : 'https://api.kraken.com';
+    $sslverify = $beta ? false : true;
+    $version = 0;
+
+    // Initialize KrakenAPI
+    $kraken = new \Payward\KrakenAPI($key, $secret, $url, $version, $sslverify);
+    $response = $kraken->QueryPublic('Ticker', array('pair' => 'XBTCZUSD'));
+    // $response = $kraken->QueryPublic('Time');
+    // $response = $kraken->QueryPrivate('Balance');
+    return $response;
+}
+
 function requestProcessor($request) {
     $logFile = __DIR__ . '/received_messages.log';
     $logTime = date('m-d-Y H:i:s');
@@ -119,6 +136,9 @@ function requestProcessor($request) {
             break;
         case "validate_session":
             $response = validateSession($request['session_token']);
+            break;
+        case "krakenQuery":
+            $response = krakenQuery();
             break;
         default:
             $response = [
