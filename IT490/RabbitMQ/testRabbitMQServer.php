@@ -19,7 +19,7 @@ function doLogin($username, $password) {
     try {
         // Connect to the database
         $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
-        // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Debug
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $stmt = $pdo->prepare("SELECT password FROM users WHERE username = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
@@ -33,8 +33,7 @@ function doLogin($username, $password) {
             $stmt->bindParam(':unixEpoch', $unixEpoch, PDO::PARAM_INT);
             $stmt->bindParam(':username', $username);
             $stmt->execute();
-
-            // Prepare token
+            
             $token = bin2hex(random_bytes(32));
             $tokenExpire = $unixEpoch + $ttl;
 
@@ -74,7 +73,7 @@ function validateSession($sessionToken) {
 
     try {
         $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
-        // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Debug
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
 
         // Validate the session token
         $stmt = $pdo->prepare("SELECT username, expire_date FROM sessions WHERE session_token = :token");
