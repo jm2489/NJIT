@@ -11,16 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'type' => "krakenQuery",
             'message' => "KrakenQuery"
         ];
-
-        // Send the request to RabbitMQ server
         $response = $client->send_request($request);
 
-        // Check if the response is already JSON-encoded
+        // Check if the response is already JSON-encoded. If it's a valid JSON string, print it as is.
         if (is_string($response) && json_decode($response) !== null) {
-            // If it's a valid JSON string, print it as is
             echo $response;
         } else {
-            // Otherwise, encode it to JSON
             echo json_encode($response);
         }
     } catch (Exception $e) {
