@@ -4,6 +4,7 @@ require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 require_once('Kraken/KrakenAPIClient.php');
 $config = include('dbClient.php');
+$apiConfig = require_once('Kraken/k_API');
 // Change accordingly this is set to 1 hour
 $ttl = 3600;
 
@@ -102,19 +103,42 @@ function validateSession($sessionToken) {
 }
 
 function krakenQuery() {
-    global $key,$secret;
+    global $apiConfig;
+    $key = $apiConfig['API_KEY'];
+    $secret = $apiConfig['API_SECRET'];
+    
     // Set which platform to use (beta or standard)
     $beta = false; 
     $url = $beta ? 'https://api.beta.kraken.com' : 'https://api.kraken.com';
     $sslverify = $beta ? false : true;
     $version = 0;
 
-    // Initialize KrakenAPI
-    $kraken = new \Payward\KrakenAPI($key, $secret, $url, $version, $sslverify);
-    $response = $kraken->QueryPublic('Ticker', array('pair' => 'XBTCZUSD'));
-    // $response = $kraken->QueryPublic('Time');
-    // $response = $kraken->QueryPrivate('Balance');
-    return $response;
+    try {
+        // Initialize KrakenAPI
+        $kraken = new \Payward\KrakenAPI($key, $secret, $url, $version, $sslverify);
+        
+        // Make the public API request for 'Ticker' data
+        $response = $kraken->QueryPrivate('Balance');
+
+        // Check if the response contains an error
+        if (isset($response['error']) && !empty($response['error'])) {
+            return [
+                "success" => false,
+                "message" => "Kraken API error: " . implode(', ', $response['error'])
+            ];
+        }
+
+        return [
+            "success" => true,
+            "data" => $response
+        ];
+
+    } catch (Exception $e) {
+        return [
+            "success" => false,
+            "message" => "Exception occurred: " . $e->getMessage()
+        ];
+    }
 }
 
 function requestProcessor($request) {
@@ -146,7 +170,8 @@ function requestProcessor($request) {
                 "message" => "ERROR: Unknown request type"
             ];
     }
-
+    $logResponse = "[" . $logTime . "] Received response: " . print_r($response, true) . PHP_EOL;
+    file_put_contents($logFile, $logResponse, FILE_APPEND);
     return json_encode($response);
 }
 
