@@ -10,7 +10,8 @@ $ttl = 3600;
 
 date_default_timezone_set('America/New_York');
 
-function doLogin($username, $password) {
+function doLogin($username, $password)
+{
     global $config, $ttl;
     $dbhost = $config['DBHOST'];
     $logindb = $config['LOGINDATABASE'];
@@ -35,7 +36,7 @@ function doLogin($username, $password) {
             $stmt->bindParam(':unixEpoch', $unixEpoch, PDO::PARAM_INT);
             $stmt->bindParam(':username', $username);
             $stmt->execute();
-            
+
             $token = bin2hex(random_bytes(32));
             $tokenExpire = $unixEpoch + $ttl;
 
@@ -65,7 +66,8 @@ function doLogin($username, $password) {
     }
 }
 
-function validateSession($sessionToken) {
+function validateSession($sessionToken)
+{
     global $config;
     $dbhost = $config['DBHOST'];
     $logindb = $config['LOGINDATABASE'];
@@ -75,7 +77,7 @@ function validateSession($sessionToken) {
 
     try {
         $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Validate the session token
         $stmt = $pdo->prepare("SELECT username, expire_date FROM sessions WHERE session_token = :token");
@@ -102,13 +104,14 @@ function validateSession($sessionToken) {
     }
 }
 
-function krakenQuery() {
+function krakenQuery($requests)
+{
     global $apiConfig;
     $key = $apiConfig['API_KEY'];
     $secret = $apiConfig['API_SECRET'];
-    
+
     // Set which platform to use (beta or standard)
-    $beta = false; 
+    $beta = false;
     $url = $beta ? 'https://api.beta.kraken.com' : 'https://api.kraken.com';
     $sslverify = $beta ? false : true;
     $version = 0;
@@ -116,10 +119,19 @@ function krakenQuery() {
     try {
         // Initialize KrakenAPI
         $kraken = new \Payward\KrakenAPI($key, $secret, $url, $version, $sslverify);
-        
-        // Make the public API request for 'Ticker' data
-        $response = $kraken->QueryPrivate('Balance');
-
+        switch ($requests) {
+            case "query";
+                $response = $kraken->QueryPrivate('Balance');
+                break;
+            case "public":
+                $response = $kraken->QueryPublic('Time');
+                break;
+            default:
+                $response = [
+                    "success" => false,
+                    "message" => "Invalid transaction type."
+                ];
+        }
         // Check if the response contains an error
         if (isset($response['error']) && !empty($response['error'])) {
             return [
@@ -127,12 +139,10 @@ function krakenQuery() {
                 "message" => "Kraken API error: " . implode(', ', $response['error'])
             ];
         }
-
         return [
             "success" => true,
             "data" => $response
         ];
-
     } catch (Exception $e) {
         return [
             "success" => false,
@@ -141,9 +151,11 @@ function krakenQuery() {
     }
 }
 
-function requestProcessor($request) {
+function requestProcessor($request)
+{
     $logFile = __DIR__ . '/received_messages.log';
     $logTime = date('m-d-Y H:i:s');
+    // Log requests
     $logRequest = "[" . $logTime . "] Received request: " . print_r($request, true) . PHP_EOL;
     file_put_contents($logFile, $logRequest, FILE_APPEND);
 
@@ -162,7 +174,7 @@ function requestProcessor($request) {
             $response = validateSession($request['session_token']);
             break;
         case "krakenQuery":
-            $response = krakenQuery();
+            $response = krakenQuery($request['transaction']);
             break;
         default:
             $response = [
@@ -170,6 +182,7 @@ function requestProcessor($request) {
                 "message" => "ERROR: Unknown request type"
             ];
     }
+    // Log response
     $logResponse = "[" . $logTime . "] Received response: " . print_r($response, true) . PHP_EOL;
     file_put_contents($logFile, $logResponse, FILE_APPEND);
     return json_encode($response);
