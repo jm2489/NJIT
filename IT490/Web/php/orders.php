@@ -246,7 +246,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a href="#" class="nav-link active" aria-current="page">
+                    <a href="info.php" class="nav-link text-white" aria-current="page">
                         <svg class="bi pe-none me-2" width="16" height="16">
                             <use xlink:href="#home" />
                         </svg>
@@ -262,7 +262,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                     </a>
                 </li>
                 <li>
-                    <a href="orders.php" class="nav-link text-white">
+                    <a href="orders.php" class="nav-link active text-white">
                         <svg class="bi pe-none me-2" width="16" height="16">
                             <use xlink:href="#table" />
                         </svg>

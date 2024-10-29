@@ -1,5 +1,6 @@
 <?php
 // Custom 403 page to deter unauthorized access from fairytale creatures
+// This is an 'action' type php file. Meaning it won't be page a user 'lands' on.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(403);
     header('Content-Type: image/gif');
