@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
         $request = [
             'type' => "krakenQuery",
-            'message' => "KrakenQuery"
+            'transaction' => "query"
         ];
         $response = $client->send_request($request);
 
