@@ -270,7 +270,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link text-white">
+                    <a href="products.php" class="nav-link text-white">
                         <svg class="bi pe-none me-2" width="16" height="16">
                             <use xlink:href="#grid" />
                         </svg>
@@ -291,82 +291,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             </div>
         </div>
         <div class="b-example-divider b-example-vr"></div>
-        <!-- Chart container -->
-        <div class="chart-container">
-            <div class="container mt-5">
-                <h2 class="text-center mb-4">Portfolio Summary</h2>
-                <!-- Chart for graphical representation -->
-                <canvas id="cryptoChart" class="mt-4"></canvas>
-            </div>
-        </div>
-
-        <script>
-            // The async function to fetch Kraken data
-            async function queryKrakenData() {
-                try {
-                    const response = await fetch('query.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success && data.data && data.data.result) {
-                        updateCryptoChart(data.data.result);
-                    } else {
-                        console.error('No data available.');
-                    }
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            }
-            // Chart stuff
-            let cryptoChart;
-
-            function updateCryptoChart(results) {
-                const labels = Object.keys(results);
-                const dataValues = Object.values(results).map(value => parseFloat(value));
-
-                if (cryptoChart) {
-                    cryptoChart.data.labels = labels;
-                    cryptoChart.data.datasets[0].data = dataValues;
-                    cryptoChart.update();
-                } else {
-                    const ctx = document.getElementById('cryptoChart').getContext('2d');
-                    cryptoChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Cryptocurrency Balances',
-                                data: dataValues,
-                                backgroundColor: [
-                                    'rgba(255, 99, 132, 0.6)', // Red
-                                    'rgba(54, 162, 235, 0.6)', // Blue
-                                    'rgba(255, 206, 86, 0.6)', // Yellow
-                                    'rgba(75, 192, 192, 0.6)', // Teal
-                                    'rgba(153, 102, 255, 0.6)' // Purple
-                                ],
-                                borderColor: [
-                                    'rgba(255, 255, 255, 1)',
-                                    'rgba(255, 255, 255, 1)',
-                                    'rgba(255, 255, 255, 1)',
-                                    'rgba(255, 255, 255, 1)',
-                                    'rgba(255, 255, 255, 1)'
-                                ],
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false
-                        }
-                    });
-                }
-            }
-            window.addEventListener('load', queryKrakenData);
-            setInterval(queryKrakenData, 60000);
-        </script>
+        <!-- Main stuff happens here -->
     </main>
     <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="sidebars.js"></script>

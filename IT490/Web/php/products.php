@@ -17,7 +17,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
 <head>
     <script src="../assets/js/color-modes.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -246,7 +246,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a href="#" class="nav-link active" aria-current="page">
+                    <a href="info.php" class="nav-link text-white" aria-current="page">
                         <svg class="bi pe-none me-2" width="16" height="16">
                             <use xlink:href="#home" />
                         </svg>
@@ -270,7 +270,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link text-white">
+                    <a href="products.php" class="nav-link active text-white">
                         <svg class="bi pe-none me-2" width="16" height="16">
                             <use xlink:href="#grid" />
                         </svg>
@@ -282,184 +282,16 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <svg class="bi pe-none me-2" width="16" height="16">
-                        <use xlink:href="#people-circle" />
-                    </svg>
+                    <img src="../assets/brand/kraken-svgrepo-com.svg" alt="" width="32" height="32" class="rounded-circle me-2">
                     <strong>Sign Out</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <!-- THIS NEEDS TO BE CHANGED TO USE A PHP SCRIPT THAT CLEARS THE SESSIONS TABLE FOR THE GIVEN USER -->
-                    <li><a class="dropdown-item" href="/php/logout.php">Sign out</a></li>
+                    <li><a class="dropdown-item" href="/index.html">Sign out</a></li>
                 </ul>
             </div>
         </div>
         <div class="b-example-divider b-example-vr"></div>
-        <!-- Chart container -->
-        <div class="chart-container">
-            <div class="container mt-5">
-                <h2 class="text-center mb-4">Portfolio Summary</h2>
-                <!-- Chart for graphical representation -->
-                <canvas id="cryptoChart" class="mt-4"></canvas>
-            </div>
-        </div>
-
-        <script>
-            const assetCodeMap = {
-                'ADA': {
-                    id: 'cardano',
-                    label: 'Cardano'
-                },
-                'ETHW': {
-                    id: 'ethereum',
-                    label: 'Ethereum'
-                },
-                'LINK': {
-                    id: 'chainlink',
-                    label: 'Chainlink'
-                },
-                'SHIB': {
-                    id: 'shiba-inu',
-                    label: 'Shiba Inu'
-                },
-                'XETH': {
-                    id: 'ethereum',
-                    label: 'Ethereum'
-                },
-                'XXBT': {
-                    id: 'bitcoin',
-                    label: 'Bitcoin'
-                },
-                'XXDG': {
-                    id: 'dogecoin',
-                    label: 'Dogecoin'
-                },
-                'ZUSD': {
-                    id: 'usd',
-                    label: 'USD'
-                }
-            };
-            let cryptoChart;
-            // Function to fetch exchange rates from coingecko's API
-            // I found a samplke code that used coingecko to do this.
-            async function fetchExchangeRates(cryptoSymbols) {
-                const ids = cryptoSymbols.map(symbol => assetCodeMap[symbol].id).join(',');
-                const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`;
-                try {
-                    const response = await fetch(url);
-                    const rates = await response.json();
-                    return rates;
-                } catch (error) {
-                    console.error('Error fetching exchange rates:', error);
-                    return {};
-                }
-            }
-            // Function to convert balances to USD with descriptive labels
-            function calculateBalancesInUSD(balances, exchangeRates) {
-                const usdBalances = {};
-                for (const [assetCode, amount] of Object.entries(balances)) {
-                    const {
-                        id,
-                        label
-                    } = assetCodeMap[assetCode];
-                    const rate = exchangeRates[id]?.usd || 0;
-                    const usdAmount = parseFloat(amount) * rate;
-
-                    // Include only balances greater than 1. 
-                    // This is to avoid displaying dust balances on other assets.
-                    if (usdAmount > 1) {
-                        usdBalances[label] = usdAmount;
-                    }
-                }
-                // console.log(usdBalances); // Debug
-                return usdBalances;
-            }
-            // Function to update the pie chart
-            async function updateCryptoChart(balances) {
-                const cryptoSymbols = Object.keys(assetCodeMap);
-                const exchangeRates = await fetchExchangeRates(cryptoSymbols);
-                const usdBalances = calculateBalancesInUSD(balances, exchangeRates);
-                const labels = Object.keys(usdBalances);
-                const dataValues = Object.values(usdBalances);
-                const ctx = document.getElementById('cryptoChart').getContext('2d');
-                if (!cryptoChart) {
-                    // Create the chart if it doesn't exist
-                    cryptoChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Cryptocurrency Balances (USD)',
-                                data: dataValues,
-                                // Only adding five for now
-                                backgroundColor: [
-                                    // Blue
-                                    'rgba(0, 0, 255, 0.8)',
-                                    // Yellow
-                                    'rgba(255, 255, 0, 0.8)',
-                                    // Green
-                                    'rgba(0, 255, 0, 0.8)',
-                                    // Red
-                                    'rgba(255, 0, 0, 0.8)',
-                                    // Purple
-                                    'rgba(128, 0, 128, 0.8)'
-                                ],
-                                borderColor: 'rgba(255, 255, 255, 1)',
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                datalabels: {
-                                    color: '#fff',
-                                    formatter: (value, context) => {
-                                        const label = context.chart.data.labels[context.dataIndex];
-                                        return `${label}\n$${value.toFixed(2)}`;
-                                    },
-                                    font: {
-                                        weight: 'bold',
-                                        size: 14
-                                    },
-                                    align: 'center',
-                                    anchor: 'center'
-                                }
-                            }
-                        },
-                        // Enable the datalabels plugin
-                        plugins: [ChartDataLabels]
-                    });
-                } else {
-                    cryptoChart.data.labels = labels;
-                    cryptoChart.data.datasets[0].data = dataValues;
-                    cryptoChart.update();
-                }
-            }
-            // Fetch balances from the server and update the chart
-            async function queryKrakenData() {
-                try {
-                    const response = await fetch('query.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    const data = await response.json();
-                    if (data.success && data.data && data.data.result) {
-                        // console.log(data.data.result); // Debug
-                        updateCryptoChart(data.data.result);
-                    } else {
-                        console.error('No data available.');
-                    }
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            }
-            document.addEventListener('DOMContentLoaded', function() {
-                queryKrakenData();
-                setInterval(queryKrakenData, 60000);
-            });
-        </script>
+        <!-- Main stuff happens here -->
     </main>
     <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="sidebars.js"></script>
