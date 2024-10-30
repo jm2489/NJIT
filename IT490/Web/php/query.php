@@ -4,7 +4,6 @@
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(403);
     header('Content-Type: image/gif');
-
     // Serve a fun GIF or fallback message.. Hehehe
     $gifPath = __DIR__ . '/../media/swamp.gif';
     if (file_exists($gifPath)) {
@@ -27,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'transaction' => "query"
         ];
         $response = $client->send_request($request);
-
         // Check if the response is already JSON-encoded. If it's a valid JSON string, print it as is.
         if (is_string($response) && json_decode($response) !== null) {
             echo $response;
