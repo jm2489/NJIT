@@ -151,6 +151,34 @@ function krakenQuery($requests)
     }
 }
 
+function doLogout($sessionToken){
+    global $config;
+    $dbhost = $config['DBHOST'];
+    $logindb = $config['LOGINDATABASE'];
+    $dbLogin = "mysql:host=$dbhost;dbname=$logindb";
+    $dbUsername = $config['DBUSER'];
+    $dbPassword = $config['DBPASSWORD'];
+
+    try {
+        $pdo = new PDO($dbLogin, $dbUsername, $dbPassword);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $pdo->prepare("DELETE FROM sessions WHERE session_token = :token");
+        $stmt->bindParam(':token', $sessionToken);
+        $stmt->execute();
+
+        return [
+            "success" => true,
+            "message" => "Logout successful!"
+        ];
+    } catch (PDOException $e) {
+        return [
+            "success" => false,
+            "message" => "An error occurred: " . $e->getMessage()
+        ];
+    }
+}
+
 function requestProcessor($request)
 {
     $logFile = __DIR__ . '/received_messages.log';
@@ -175,6 +203,9 @@ function requestProcessor($request)
             break;
         case "krakenQuery":
             $response = krakenQuery($request['transaction']);
+            break;
+        case "logout":
+            $response = doLogout($request['session_token']);
             break;
         default:
             $response = [
