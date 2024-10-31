@@ -1,0 +1,266 @@
+/* --GENERAL-- */
+
+body { 
+    font-family: "Titillium Web", sans-serif;
+    background-attachment: fixed;
+    background-color: rgba(0, 0, 0, 0.6);
+    background-size: cover;
+    color: #0566c7;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #1e135e;
+    color: white;
+
+}
+
+.body-index, .body-signup {
+    overflow: hidden;
+}
+
+/* --HEADER-- */
+
+.main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 1125px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-title {
+    margin-left: 95px;
+    font-size: 25px;
+    font-weight: 1000;
+    color: rgba(225, 225, 225, 1)
+}
+
+.link-list {
+    list-style: none;
+    display: flex;
+}
+
+.link-item {
+    margin-right: 25px;
+}
+
+.btn {
+    background: none;
+    border: none;
+    width: 90px;
+    height: 60px;
+}
+
+.placeholder-link {
+    text-decoration: none;
+    color: rgba(225, 225, 225, 0.75);
+    font-weight: 500;
+    font-size: 20px;
+    transition: all 0.5s;
+}
+
+.placeholder-link:hover {
+    color: rgba(225, 225, 225, 1);
+}
+
+
+/* --MAIN-- */
+
+.main-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.user-div {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+}
+
+.password-div {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.h2-title {
+    text-align: center;
+}
+
+.logo-image {
+    height: 65px;
+    width: 65px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 10px;
+    margin-top: 90px;
+}
+
+.username-label {
+    position: absolute;
+    left: 16px;
+    top: -12px;
+    padding: 0 8px;
+    color: white;
+    cursor: text;
+    background-color: #1e135e;
+    transition: top 200ms ease-in, left 200ms ease-in, font-size 200ms ease-in;
+}
+
+/*
+.user-div:focus-within .username-label {
+    top:-8px;
+    font-size: 15px;
+    background-color: #1e135e;
+}
+*/
+
+.input-username {
+    padding: 25px;
+    margin-bottom: 10px;
+    border-radius: 2px solid black;
+    border-radius: 10px;
+    border-style: solid;
+    color: white;
+    outline: none;
+    background: none;
+}
+
+.input-username:hover {
+    border-color: #5741d9
+}
+
+.input-username:focus {
+    border-color: blue;
+}
+
+
+.password-label {
+    position: absolute;
+    left: 16px;
+    top: -12px;
+    padding: 0 8px;
+    color: white;
+    cursor: text;
+    background-color: #1e135e;
+    transition: top 200ms ease-in, left 200ms ease-in, font-size 200ms ease-in;
+
+}
+
+/*
+.password-div:focus-within .password-label {
+    top:-8px;
+    font-size: 15px;
+    background-color: #1e135e;
+}
+*/
+
+.input-password {
+    padding: 25px;
+    margin-bottom: 10px;
+    border-radius: 2px solid black;
+    border-style: solid;
+    border-radius: 10px;
+    color: white;
+    outline: none;
+    background: none;
+}
+
+.input-password:hover {
+    border-color: #5741d9
+}
+
+.input-password:focus {
+    border-color: blue;
+}
+
+.input-submit {
+    background-color: #5741d9;
+    color: white;
+    border: none;
+    padding: 20px;
+    cursor: pointer;
+    transition: background-color 0.5s;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.input-submit:hover {
+    background-color: #a396ea;
+}
+
+.signup-link {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.link-signup:visited {
+    color: #a396ea;
+}
+
+.json-r {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+
+
+/* --FOOTER-- */
+
+.footer {
+    display: flex;
+    width: 1125px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    border-top: 1px solid #5741d9;
+    padding-left: 2px;
+}
+
+/* --HOME PAGE-- */
+
+.section-text {
+    display: flex;
+    flex-direction: column; 
+}
+
+.home-title {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 80px;
+}
+
+.place-text {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    inline-size: 650px;
+    text-wrap: pretty;
+}
+
+.logo-home {
+    position: absolute;
+    margin-left: 27px;
+    height: 55px;
+    width: 55px;
+}
