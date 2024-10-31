@@ -23,7 +23,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
-    <title>Sidebars · Bootstrap v5.3</title>
+    <title>Orders</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/">
 
@@ -274,7 +274,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                         <svg class="bi pe-none me-2" width="16" height="16">
                             <use xlink:href="#grid" />
                         </svg>
-                        Products
+                        Analytics
                     </a>
                 </li>
             </ul>

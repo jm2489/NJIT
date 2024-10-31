@@ -107,13 +107,16 @@ body {
     text-align: center;
 }
 
-.logo-image {
+#logo-image {
     height: 65px;
     width: 65px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 10px;
-    margin-top: 90px;
+    margin: auto;
+}
+
+.logo-div {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 .username-label {

@@ -30,7 +30,6 @@
           },
           success: function (response) {
             try {
-              // let result = typeof response === 'string' ? JSON.parse(response) : response;
               if (response.success) {
                 $('#response').html(
                   `<strong style='color:green;'>${response.message}</strong>`
@@ -65,33 +64,14 @@
 </head>
 
 <body class="body-index">
-  <!--<header class="main-header">
-        <h1 class="page-title">IT-490-Project</h1>
-        <nav class="header-nav">
-            <ul class="link-list">
-                <li class="link-item">
-                    <button class="btn">
-                        <a href="#" class="placeholder-link">Link1</a>
-                    </button>
-                </li>
-                <li class="link-item">
-                    <button class="btn">
-                        <a href="#" class="placeholder-link">Link2</a>
-                    </button>
-                </li>
-                <li class="link-item">
-                    <button class="signup">
-                        <a href="signup.html" class="placeholder-link">Signup</a>
-                    </button>
-                </li>
-            </ul>
-        </nav>
-  </header>-->
-
   <main class="main-section">
     <form id="login-form">
-      <img src="kraken-svgrepo-com.png" alt="" class="logo-image">
-      <h2 class="h2-title">Login</h2>
+      <div class="logo-div">
+        <img src="kraken-svgrepo-com.png" alt="Kraken-logo.png" id="logo-image">
+      </div>
+      <div style="align-items: center;">
+        <h2 class="h2-title">Login</h2>
+      </div>
       <div class="user-div">
         <label class="username-label" for="username">Username</label>
         <input type="text" class="input-username" id="username" name="username" required placeholder=" "><br><br>
@@ -100,7 +80,6 @@
         <label class="password-label" for="password">Password</label>
         <input type="password" class="input-password" id="password" name="password" required placeholder=" "><br><br>
       </div>
-      <!-- <input type="submit" class="input-submit" value="Login"> -->
       <button class="input-submit btn btn-primary w-100 py-2" type="submit" value="Login">Sign in</button>
     </form>
   </main>
