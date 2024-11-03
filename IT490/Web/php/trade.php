@@ -106,23 +106,83 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             display: block !important;
         }
 
-        .chart-container {
-            width: 60%;
-            height: 60vh;
-            /* Set a fixed height */
-            display: flex;
-            justify-content: center;
-            /* align-items: center; */
-            /* margin: 0 auto; */
+        /* Sidebar styling */
+        .text-bg-dark {
+            background-color: #343a40 !important;
+            color: white;
+            min-height: 100vh;
         }
 
-        #cryptoChart {
-            width: 100% !important;
-            height: 100% !important;
+        .text-bg-dark a {
+            color: #ddd;
+        }
+
+        .text-bg-dark a:hover {
+            color: #fff;
+        }
+
+        /* Main ticker container styling */
+        .ticker-container {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            align-items: center;
+            background-color: #343a40;
+            padding: 20px;
+            width: 100%;
+            height: 100vh;
+            /* Full height for the main content */
+        }
+
+        /* Ticker wrapper */
+        .ticker-wrap {
+            overflow: hidden;
+            width: 80%;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ticker scroll effect */
+        .ticker {
+            display: flex;
+            gap: 20px;
+            /* Space between items */
+            white-space: nowrap;
+        }
+
+        /* Canvas styling */
+        #tickerData {
+            width: 100%;
+            height: 60px;
+        }
+
+        .enabled {
+            background-color: #4CAF50;
+            /* Green */
+            color: white;
+        }
+
+        .disabled {
+            background-color: #f44336;
+            /* Red */
+            color: white;
+        }
+
+        #buttons-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #buttons-container button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
-
-
     <!-- Custom styles for this template -->
     <link href="sidebars.css" rel="stylesheet">
 </head>
@@ -234,10 +294,10 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                 <img class="mb-4" src="../assets/brand/kraken-svgrepo-com.svg" alt="Kraken Logo" width="72" height="57">
                 <span class="fs-4">Welcome <?php
-                                            // Proper case... Yikes this looks weird...
-                                            $properUsername = ucwords($username);
-                                            echo $properUsername;
-                                            ?></span>
+                // Proper case... Yikes this looks weird...
+                $properUsername = ucwords($username);
+                echo $properUsername;
+                ?></span>
             </a>
 
             <hr>
@@ -279,7 +339,8 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="../assets/brand/kraken-svgrepo-com.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <img src="../assets/brand/kraken-svgrepo-com.svg" alt="" width="32" height="32"
+                        class="rounded-circle me-2">
                     <strong>Sign Out</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
@@ -289,7 +350,156 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
         </div>
         <div class="b-example-divider b-example-vr"></div>
         <!-- The main stuff happens here -->
+        <div class="ticker-container">
+            <div class="ticker-wrap">
+                <button onclick="toggleAll(true)">Enable All</button>
+                <button onclick="toggleAll(false)">Disable All</button>
+                <div id="buttons-container" style="text-align: center;">
+                </div>
+                <div class="ticker">
+                    <canvas id="tickerData" width="auto" height="auto"></canvas>
+                </div>
+            </div>
+        </div>
     </main>
+    <script>
+        let chart;
+
+        // Function to fetch the top 20 coins
+        async function fetchCryptoData() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true');
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+
+                // Calculate 7-week average change from sparkline data
+                function calculate7WeekChange(prices) {
+                    const weekCount = 7;
+                    const weeklyChanges = [];
+                    for (let i = 0; i < weekCount; i++) {
+                        const weekStart = Math.floor(i * (prices.length / weekCount));
+                        const weekEnd = Math.floor((i + 1) * (prices.length / weekCount)) - 1;
+
+                        if (prices[weekEnd] !== undefined && prices[weekStart] !== undefined) {
+                            const weeklyChange = ((prices[weekEnd] - prices[weekStart]) / prices[weekStart]) * 100;
+                            weeklyChanges.push(weeklyChange);
+                        }
+                    }
+                    const avgWeeklyChange = weeklyChanges.reduce((sum, change) => sum + change, 0) / weeklyChanges.length;
+                    return avgWeeklyChange;
+                }
+
+                data.forEach(coin => {
+                    if (coin.sparkline_in_7d) {
+                        coin.sevenWeekChange = calculate7WeekChange(coin.sparkline_in_7d.price);
+                    } else {
+                        coin.sevenWeekChange = 0;
+                    }
+                });
+
+                const topCoins = data.sort((a, b) => b.sevenWeekChange - a.sevenWeekChange).slice(0, 20);
+
+                const labels = topCoins[0].sparkline_in_7d.price.map((_, i) => {
+                    const date = new Date();
+                    date.setHours(date.getHours() - (topCoins[0].sparkline_in_7d.price.length - i));
+                    return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit' });
+                });
+
+                return { topCoins, labels };
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+                return { topCoins: [], labels: [] };
+            }
+        }
+
+        // Function to render ticker data using Chart.js
+        async function renderTickerData() {
+            const { topCoins, labels } = await fetchCryptoData();
+
+            // Destroy the previous chart if it exists
+            if (chart) {
+                chart.destroy();
+            }
+
+            const datasets = topCoins.map((crypto, index) => ({
+                label: `${crypto.name}`,
+                data: crypto.sparkline_in_7d.price,
+                borderColor: `rgba(0, 123, 255, ${1 - index * 0.05})`,
+                fill: false,
+                tension: 0.1,
+                hidden: false
+            }));
+
+            const ctx = document.getElementById('tickerData').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price (USD)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Generate buttons for each coin with initial enabled style
+            const buttonsContainer = document.getElementById('buttons-container');
+            buttonsContainer.innerHTML = '';
+
+            topCoins.forEach((coin, index) => {
+                const button = document.createElement('button');
+                button.textContent = coin.name;
+                button.classList.add('enabled');
+                button.onclick = () => toggleDatasetVisibility(index, button);
+                buttonsContainer.appendChild(button);
+            });
+        }
+
+        // Toggle visibility of a coin and update button style
+        function toggleDatasetVisibility(index, button) {
+            const dataset = chart.data.datasets[index];
+            dataset.hidden = !dataset.hidden;
+            button.classList.toggle('enabled', !dataset.hidden);
+            button.classList.toggle('disabled', dataset.hidden);
+
+            chart.update();
+        }
+
+        // Enable or disable all coins and update all buttons
+        function toggleAll(enable) {
+            chart.data.datasets.forEach((dataset, index) => {
+                dataset.hidden = !enable; // Set all to hidden or visible
+                const button = document.getElementById('buttons-container').children[index];
+                button.classList.toggle('enabled', enable);
+                button.classList.toggle('disabled', !enable);
+            });
+            chart.update();
+        }
+
+        // Initial render and set interval for updating data
+        renderTickerData();
+        setInterval(renderTickerData, 60000);
+    </script>
+
     <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="sidebars.js"></script>
 </body>

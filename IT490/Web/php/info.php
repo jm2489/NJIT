@@ -237,10 +237,10 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                 <img class="mb-4" src="../assets/brand/kraken-svgrepo-com.svg" alt="Kraken Logo" width="72" height="57">
                 <span class="fs-4">Welcome <?php
-                                            // Proper case... Yikes this looks weird...
-                                            $properUsername = ucwords($username);
-                                            echo $properUsername;
-                                            ?></span>
+                // Proper case... Yikes this looks weird...
+                $properUsername = ucwords($username);
+                echo $properUsername;
+                ?></span>
             </a>
 
             <hr>
@@ -301,7 +301,6 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                 <!-- Chart for graphical representation -->
                 <canvas id="cryptoChart" class="mt-4"></canvas>
             </div>
-        </div>
 
         <script>
             const assetCodeMap = {
@@ -455,7 +454,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                     console.error('Error fetching data:', error);
                 }
             }
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 queryKrakenData();
                 setInterval(queryKrakenData, 60000);
             });
