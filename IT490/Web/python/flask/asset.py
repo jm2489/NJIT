@@ -8,10 +8,8 @@ import base64
 from dotenv import load_dotenv
 import urllib.parse
 
-# Load environment variables
-load_dotenv("/var/www/html/flask/k_API.env")
-
 app = Flask(__name__)
+load_dotenv("/var/www/html/flask/k_API.env")
 
 # Function to make authenticated requests to Kraken API
 def kraken_private_request(uri_path, data):
@@ -57,7 +55,6 @@ def index():
     # Filter assets with a non dust balance
     portfolio = {asset for asset, amount in balances.items() if float(amount) > 0}
     
-    print(portfolio)
     # Fetch asset pairs from Kraken API
     asset_pairs_response = requests.get("https://api.kraken.com/0/public/AssetPairs")
     asset_pairs = asset_pairs_response.json().get('result', {})
@@ -69,8 +66,6 @@ def index():
     })
 
     return render_template('index.html', base_currencies=base_currencies)
-
-
 
 @app.route('/get_quote_currencies', methods=['GET'])
 def get_quote_currencies():
@@ -102,5 +97,5 @@ def get_pair_details():
 
     return jsonify({'error': 'Asset pair not found'}), 404
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
