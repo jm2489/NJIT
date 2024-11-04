@@ -368,7 +368,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
         // Function to fetch the top 20 coins
         async function fetchCryptoData() {
             try {
-                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true');
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=true');
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
 
@@ -497,7 +497,6 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
 
         // Initial render and set interval for updating data
         renderTickerData();
-        setInterval(renderTickerData, 60000);
     </script>
 
     <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>

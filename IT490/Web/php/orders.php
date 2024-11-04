@@ -237,10 +237,10 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                 <img class="mb-4" src="../assets/brand/kraken-svgrepo-com.svg" alt="Kraken Logo" width="72" height="57">
                 <span class="fs-4">Welcome <?php
-                                            // Proper case... Yikes this looks weird...
-                                            $properUsername = ucwords($username);
-                                            echo $properUsername;
-                                            ?></span>
+                // Proper case... Yikes this looks weird...
+                $properUsername = ucwords($username);
+                echo $properUsername;
+                ?></span>
             </a>
 
             <hr>
@@ -282,7 +282,8 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="../assets/brand/kraken-svgrepo-com.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <img src="../assets/brand/kraken-svgrepo-com.svg" alt="" width="32" height="32"
+                        class="rounded-circle me-2">
                     <strong>Sign Out</strong>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
@@ -292,7 +293,102 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
         </div>
         <div class="b-example-divider b-example-vr"></div>
         <!-- Main stuff happens here -->
+        <h1>Select a Currency Pair</h1>
+
+        <label for="base_currency">Base Currency:</label>
+        <select id="base_currency">
+            <option value="">Select Base Currency</option>
+            {% for currency in base_currencies %}
+            <option value="{{ currency }}">{{ currency }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="quote_currency">Quote Currency:</label>
+        <select id="quote_currency">
+            <option value="">Select Quote Currency</option>
+        </select>
+
+        <h2>Asset Pair Details</h2>
+        <div id="pair_details">
+            <p>Select a base and quote currency to see details.</p>
+        </div>
     </main>
+
+    <script>
+        document.getElementById('base_currency').addEventListener('change', function() {
+            let baseCurrency = this.value;
+            let quoteCurrencySelect = document.getElementById('quote_currency');
+            let pairDetailsDiv = document.getElementById('pair_details');
+            
+            // Clear quote currency and pair details
+            quoteCurrencySelect.innerHTML = '<option value="">Loading...</option>';
+            pairDetailsDiv.innerHTML = '<p>Select a base and quote currency to see details.</p>';
+
+            // Fetch quote currencies based on selected base currency
+            fetch(`/get_quote_currencies?base=${baseCurrency}`)
+                .then(response => response.json())
+                .then(data => {
+                    quoteCurrencySelect.innerHTML = '<option value="">Select Quote Currency</option>';
+                    data.forEach(currency => {
+                        let option = document.createElement('option');
+                        option.value = currency;
+                        option.text = currency;
+                        quoteCurrencySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching quote currencies:', error);
+                    quoteCurrencySelect.innerHTML = '<option value="">Error loading quote currencies</option>';
+                });
+        });
+
+        document.getElementById('quote_currency').addEventListener('change', function() {
+            let baseCurrency = document.getElementById('base_currency').value;
+            let quoteCurrency = this.value;
+            let pairDetailsDiv = document.getElementById('pair_details');
+
+            if (!baseCurrency || !quoteCurrency) {
+                pairDetailsDiv.innerHTML = '<p>Select a base and quote currency to see details.</p>';
+                return;
+            }
+
+            // Fetch pair details based on selected base and quote currency
+            fetch(`/get_pair_details?base=${baseCurrency}&quote=${quoteCurrency}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        pairDetailsDiv.innerHTML = `<p>${data.error}</p>`;
+                    } else {
+                        // Display pair details in a readable format
+                        pairDetailsDiv.innerHTML = `
+                            <h3>Details for ${baseCurrency}/${quoteCurrency}</h3>
+                            <ul>
+                                <li>Alt Name: ${data.altname}</li>
+                                <li>Base Currency: ${data.base}</li>
+                                <li>Quote Currency: ${data.quote}</li>
+                                <li>Lot Size: ${data.lot}</li>
+                                <li>Pair Decimals: ${data.pair_decimals}</li>
+                                <li>Lot Decimals: ${data.lot_decimals}</li>
+                                <li>Fee Volume Currency: ${data.fee_volume_currency}</li>
+                                <li>Fees: ${data.fees}</li>
+                                <li>Leverage Buy Options: ${data.leverage_buy}</li>
+                                <li>Leverage Sell Options: ${data.leverage_sell}</li>
+                                <li>Minimum Order Size: ${data.ordermin}</li>
+                                <li>WebSocket Name: ${data.wsname}</li>
+                                <li>Base Asset Class: ${data.aclass_base}</li>
+                                <li>Quote Asset Class: ${data.aclass_quote}</li>
+                                <li>Margin Call Level: ${data.margin_call}</li>
+                                <li>Margin Stop Level: ${data.margin_stop}</li>
+                            </ul>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching pair details:', error);
+                    pairDetailsDiv.innerHTML = '<p>Error loading pair details.</p>';
+                });
+        });
+    </script>
     <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
     <script src="sidebars.js"></script>
 </body>
