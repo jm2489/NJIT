@@ -8,6 +8,6 @@ response = requests.get(url)
 pairs = response.json()
 
 # Filter pairs containing BTC (XBT) and ETH
-btc_eth_pairs = {key: value for key, value in pairs['result'].items() if 'XBT' in key and 'ETH' in key}
+btc = {key: value for key, value in pairs['result'].items() if 'XETH' in key}
 
-print(json.dumps(btc_eth_pairs, indent=4))
+print(json.dumps(btc, indent=4))

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Currency Pairs</title>
+</head>
+<body>
+    <h1>Select a Currency Pair</h1>
+    
+    <label for="base_currency">Base Currency:</label>
+    <select id="base_currency">
+        <option value="">Select Base Currency</option>
+        {% for currency in base_currencies %}
+            <option value="{{ currency }}">{{ currency }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="quote_currency">Quote Currency:</label>
+    <select id="quote_currency">
+        <option value="">Select Quote Currency</option>
+    </select>
+
+    <h2>Asset Pair Details</h2>
+    <div id="pair_details">
+        <p>Select a base and quote currency to see details.</p>
+    </div>
+
+    <script>
+        document.getElementById('base_currency').addEventListener('change', function() {
+            let baseCurrency = this.value;
+            let quoteCurrencySelect = document.getElementById('quote_currency');
+            let pairDetailsDiv = document.getElementById('pair_details');
+            
+            // Clear quote currency and pair details
+            quoteCurrencySelect.innerHTML = '<option value="">Loading...</option>';
+            pairDetailsDiv.innerHTML = '<p>Select a base and quote currency to see details.</p>';
+
+            // Fetch quote currencies based on selected base currency
+            fetch(`/get_quote_currencies?base=${baseCurrency}`)
+                .then(response => response.json())
+                .then(data => {
+                    quoteCurrencySelect.innerHTML = '<option value="">Select Quote Currency</option>';
+                    data.forEach(currency => {
+                        let option = document.createElement('option');
+                        option.value = currency;
+                        option.text = currency;
+                        quoteCurrencySelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching quote currencies:', error);
+                    quoteCurrencySelect.innerHTML = '<option value="">Error loading quote currencies</option>';
+                });
+        });
+
+        document.getElementById('quote_currency').addEventListener('change', function() {
+            let baseCurrency = document.getElementById('base_currency').value;
+            let quoteCurrency = this.value;
+            let pairDetailsDiv = document.getElementById('pair_details');
+
+            if (!baseCurrency || !quoteCurrency) {
+                pairDetailsDiv.innerHTML = '<p>Select a base and quote currency to see details.</p>';
+                return;
+            }
+
+            // Fetch pair details based on selected base and quote currency
+            fetch(`/get_pair_details?base=${baseCurrency}&quote=${quoteCurrency}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        pairDetailsDiv.innerHTML = `<p>${data.error}</p>`;
+                    } else {
+                        // Display pair details in a readable format
+                        pairDetailsDiv.innerHTML = `
+                            <h3>Details for ${baseCurrency}/${quoteCurrency}</h3>
+                            <ul>
+                                <li>Alt Name: ${data.altname}</li>
+                                <li>Base Currency: ${data.base}</li>
+                                <li>Quote Currency: ${data.quote}</li>
+                                <li>Lot Size: ${data.lot}</li>
+                                <li>Pair Decimals: ${data.pair_decimals}</li>
+                                <li>Lot Decimals: ${data.lot_decimals}</li>
+                                <li>Fee Volume Currency: ${data.fee_volume_currency}</li>
+                                <li>Fees: ${data.fees}</li>
+                                <li>Leverage Buy Options: ${data.leverage_buy}</li>
+                                <li>Leverage Sell Options: ${data.leverage_sell}</li>
+                                <li>Minimum Order Size: ${data.ordermin}</li>
+                                <li>WebSocket Name: ${data.wsname}</li>
+                                <li>Base Asset Class: ${data.aclass_base}</li>
+                                <li>Quote Asset Class: ${data.aclass_quote}</li>
+                                <li>Margin Call Level: ${data.margin_call}</li>
+                                <li>Margin Stop Level: ${data.margin_stop}</li>
+                            </ul>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching pair details:', error);
+                    pairDetailsDiv.innerHTML = '<p>Error loading pair details.</p>';
+                });
+        });
+    </script>
+</body>
+</html>
