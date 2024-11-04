@@ -37,7 +37,7 @@
             pairDetailsDiv.innerHTML = '<p>Select a base and quote currency to see details.</p>';
 
             // Fetch quote currencies based on selected base currency
-            fetch(`/get_quote_currencies?base=${baseCurrency}`)
+            fetch(`/flaskapp/get_quote_currencies?base=${baseCurrency}`)
                 .then(response => response.json())
                 .then(data => {
                     quoteCurrencySelect.innerHTML = '<option value="">Select Quote Currency</option>';
@@ -65,7 +65,7 @@
             }
 
             // Fetch pair details based on selected base and quote currency
-            fetch(`/get_pair_details?base=${baseCurrency}&quote=${quoteCurrency}`)
+            fetch(`/flaskapp/get_pair_details?base=${baseCurrency}&quote=${quoteCurrency}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {

@@ -23,7 +23,7 @@ def kraken_private_request(uri_path, data):
         return {"error": "API key or secret not loaded. Check k_API.env file."}
 
     # Generate a nonce automatically
-    data['nonce'] = str(int(time.time() * 100000))
+    data['nonce'] = str(int(time.time() * 1000000))
 
     # Encode data for API-Sign
     postdata = urllib.parse.urlencode(data)
