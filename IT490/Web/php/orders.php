@@ -232,7 +232,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
         </symbol>
     </svg>
 
-    <main class="d-flex flex-nowrap">
+    <main class="d-flex bg-dark flex-nowrap">
         <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                 <img class="mb-4" src="../assets/brand/kraken-svgrepo-com.svg" alt="Kraken Logo" width="72" height="57">
@@ -293,33 +293,41 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
         </div>
         <div class="b-example-divider b-example-vr"></div>
         <!-- Main stuff happens here -->
-        <h1>Select a Currency Pair</h1>
+        <div class="container mt-5 p-4 bg-dark text-light rounded">
+            <h1 class="text-center">Select a Currency Pair</h1>
 
-        <label for="base_currency">Base Currency:</label>
-        <select id="base_currency">
-            <option value="">Select Base Currency</option>
-            {% for currency in base_currencies %}
-            <option value="{{ currency }}">{{ currency }}</option>
-            {% endfor %}
-        </select>
+            <div class="form-group my-4">
+                <label for="base_currency" class="form-label">Base Currency:</label>
+                <select id="base_currency" class="form-select">
+                    <option value="">Select Base Currency</option>
+                    {% for currency in base_currencies %}
+                    <option value="{{ currency }}">{{ currency }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <label for="quote_currency">Quote Currency:</label>
-        <select id="quote_currency">
-            <option value="">Select Quote Currency</option>
-        </select>
+            <div class="form-group my-4">
+                <label for="quote_currency" class="form-label">Quote Currency:</label>
+                <select id="quote_currency" class="form-select">
+                    <option value="">Select Quote Currency</option>
+                </select>
+            </div>
 
-        <h2>Asset Pair Details</h2>
-        <div id="pair_details">
-            <p>Select a base and quote currency to see details.</p>
+            <div class="mt-5">
+                <h2 class="text-center">Asset Pair Details</h2>
+                <div id="pair_details" class="alert alert-info text-center mt-3">
+                    <p>Select a base and quote currency to see details.</p>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        document.getElementById('base_currency').addEventListener('change', function() {
+        document.getElementById('base_currency').addEventListener('change', function () {
             let baseCurrency = this.value;
             let quoteCurrencySelect = document.getElementById('quote_currency');
             let pairDetailsDiv = document.getElementById('pair_details');
-            
+
             // Clear quote currency and pair details
             quoteCurrencySelect.innerHTML = '<option value="">Loading...</option>';
             pairDetailsDiv.innerHTML = '<p>Select a base and quote currency to see details.</p>';
@@ -342,7 +350,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                 });
         });
 
-        document.getElementById('quote_currency').addEventListener('change', function() {
+        document.getElementById('quote_currency').addEventListener('change', function () {
             let baseCurrency = document.getElementById('base_currency').value;
             let quoteCurrency = this.value;
             let pairDetailsDiv = document.getElementById('pair_details');

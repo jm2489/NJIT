@@ -232,7 +232,7 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
         </symbol>
     </svg>
 
-    <main class="d-flex flex-nowrap">
+    <main class="d-flex flex-nowrap bg-dark text-white">
         <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 280px;">
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                 <img class="mb-4" src="../assets/brand/kraken-svgrepo-com.svg" alt="Kraken Logo" width="72" height="57">
