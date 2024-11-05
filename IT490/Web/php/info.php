@@ -444,9 +444,10 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
                         }
                     });
                     const data = await response.json();
-                    if (data.success && data.data && data.data.result) {
-                        // console.log(data.data.result); // Debug
-                        updateCryptoChart(data.data.result);
+                    // console.log(data.data); // Debug
+                    if (data.success && data.data) {
+                        // console.log(data.data); // Debug
+                        updateCryptoChart(data.data);
                     } else {
                         console.error('No data available.');
                     }
@@ -456,7 +457,6 @@ if (is_array($responseArray) && isset($responseArray['success']) && $responseArr
             }
             document.addEventListener('DOMContentLoaded', function () {
                 queryKrakenData();
-                setInterval(queryKrakenData, 60000);
             });
         </script>
     </main>

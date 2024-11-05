@@ -4,6 +4,7 @@ import time
 import hashlib
 import hmac
 import base64
+import json
 from dotenv import load_dotenv
 import urllib.parse
 
@@ -47,4 +48,4 @@ headers = {
 response = requests.post(url, headers=headers, data=postdata)
 
 # Print response
-print(response.json())
+print(json.dumps(response.json(), indent=4))
