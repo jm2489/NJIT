@@ -2,9 +2,7 @@
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
-require_once('Kraken/KrakenAPIClient.php');
 $config = include('dbClient.php');
-$apiConfig = require_once('Kraken/k_API');
 // Change accordingly this is set to 1 hour
 $ttl = 3600;
 
@@ -115,7 +113,7 @@ function krakenQuery($request)
 
     try {
         // Call the Python script to retrieve the balance
-        $output = shell_exec("python3 /home/jude/RabbitMQ/balance.py");
+        $output = shell_exec("python3 ~/RabbitMQ/balance.py");
 
         // Decode the JSON output from the Python script
         $response = json_decode($output, true);
