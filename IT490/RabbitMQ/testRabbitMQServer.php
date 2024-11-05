@@ -104,41 +104,30 @@ function validateSession($sessionToken)
     }
 }
 
-function krakenQuery($requests)
+function krakenQuery($request)
 {
-    global $apiConfig;
-    $key = $apiConfig['API_KEY'];
-    $secret = $apiConfig['API_SECRET'];
-
-    // Set which platform to use (beta or standard)
-    $beta = false;
-    $url = $beta ? 'https://api.beta.kraken.com' : 'https://api.kraken.com';
-    $sslverify = $beta ? false : true;
-    $version = 0;
+    if ($request !== "query") {
+        return [
+            "success" => false,
+            "message" => "Invalid transaction type."
+        ];
+    }
 
     try {
-        // Initialize KrakenAPI
-        $kraken = new \Payward\KrakenAPI($key, $secret, $url, $version, $sslverify);
-        switch ($requests) {
-            case "query";
-                $response = $kraken->QueryPrivate('Balance');
-                break;
-            case "public":
-                $response = $kraken->QueryPublic('Time');
-                break;
-            default:
-                $response = [
-                    "success" => false,
-                    "message" => "Invalid transaction type."
-                ];
-        }
-        // Check if the response contains an error
-        if (isset($response['error']) && !empty($response['error'])) {
+        // Call the Python script to retrieve the balance
+        $output = shell_exec("python3 /home/jude/RabbitMQ/balance.py");
+
+        // Decode the JSON output from the Python script
+        $response = json_decode($output, true);
+
+        // Check if JSON decoding was successful. Needed this for debugging purposes
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return [
                 "success" => false,
-                "message" => "Kraken API error: " . implode(', ', $response['error'])
+                "message" => "Failed to parse JSON from balance.py output: " . json_last_error_msg()
             ];
         }
+
         return [
             "success" => true,
             "data" => $response
@@ -150,6 +139,7 @@ function krakenQuery($requests)
         ];
     }
 }
+
 
 function doLogout($sessionToken){
     global $config;
