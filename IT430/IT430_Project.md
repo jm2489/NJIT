@@ -1,3 +1,18 @@
+### Author: Judrianne Mahigne (jm2489)
+### Course: IT430-005
+
+## Final Project
+## Introduction
+This document outlines 4 of the test we have conducted during class. The content is structured as follows:
+- **Name of the vulnerability/exploit**
+- **Vulnerability Description**: A detailed explanation of the vulnerability/exploit.
+- **Objective**: Key goals of testing the vulnerability, including learning outcomes and practical security lessons.
+- **Testing Environment**: An overview of the virtualized setup used for both victim and attacker systems.
+- **Testing Procedures**: Step-by-step instructions for executing the exploit using the Metasploit framework.
+- **Recommended Mitigation**: Practical solutions and best practices for securing systems against such vulnerabilities.
+- **The last section is reserved for citations/screenshots**
+
+---
 ## Test 1: [Chapter 4: MS08-067]
 
 ### Vulnerability Description
@@ -427,3 +442,14 @@ The goal of this test is to show how well spear-phishing works as a way of socia
 ![image](ch4_2.png)
 
 ![image](ch4_3.png)
+
+- ### Test 2
+![image](ch5_1.png)
+
+- ### Test 3
+![image](ch9_1.png)
+
+- ### Test 4
+![image](ch12_1.png)
+
+![image](ch12_2.png)
