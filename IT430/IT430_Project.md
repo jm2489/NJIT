@@ -418,3 +418,12 @@ The goal of this test is to show how well spear-phishing works as a way of socia
 - **Mitigation Steps:** Spear-phishing attacks can be mitigated by reducing user exposure to malicious emails and payloads. To close gaps in security, companies should make sure that all of their employees regularly install software updates and patches, especially for Adobe Reader and other widely used programs. Using strong email screening and scanning attachments can also make it much less likely that malicious files are delivered to end users.
 - **Security Best Practices:** A strong defense against phishing involves fostering a culture of cybersecurity awareness. Multi-factor authentication (MFA) adds an extra layer of security that makes it hard for hackers to use stolen credentials. Monitoring networks and simulating phishing attacks on a regular basis can help find weak spots and make users and organizations better at handling threats.
 ---
+
+## Citations/Screenshots
+- ### Test 1
+
+![image](ch4_1.png)
+
+![image](ch4_2.png)
+
+![image](ch4_3.png)
