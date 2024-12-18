@@ -1,6 +1,7 @@
 
 # IT 620: Final Exam Study Guide
 
+
 This guide covers all topics from the course, emphasizing material after the midterm.
 
 ---
